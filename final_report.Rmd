@@ -1,0 +1,81 @@
+---
+title: 'Diabetes Project'
+author: "Aly O'Mahoney"
+date: "10/11/2020"
+output:
+  rmdformats::readthedown:
+    self_contained: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(knitr)) install.packages("knitr", repos = "http://cran.us.r-project.org")
+if(!require(kableExtra)) install.packages("kableExtra", repos = "http://cran.us.r-project.org")
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+```
+
+# Abstract
+
+# Introduction
+This report aims to construct a machine learning model which predicts whether a patient is at risk of being diabetic. [Approach 1: Logistic Regression] constricts a logistic regression model. [Approach 2: k-Nearest Neighbours] Constructs a k-nearest neighbours model using the Jaccard distance. [Approach 3: Decision Tree] constructs a decision tree. This method is in line with how people may expect doctors to make decisions in reality. [Approach 4: Random Forest] is an extension on [Approach 3: Decision Tree]. [Ensemble] constructs an ensemble of three of the previous models. [Final Model (Results)] retrains the ensemble on a slightly larger data set and assesses its performance using a validation set which is not been used for model construction or selection at any point in this report.
+
+The data being worked with is the [Early stage diabetes risk prediction dataset](https://archive.ics.uci.edu/ml/datasets/Early+stage+diabetes+risk+prediction+dataset.). It was created using questionnaires from the patients of Sylhet Diabetic Hospital (Bangladesh) and has been approved by a doctor [[1](https://archive.ics.uci.edu/ml/datasets/Early+stage+diabetes+risk+prediction+dataset.)]. 
+
+For this report, the Early stage diabetes risk prediction dataset is split into a training and a test set (`diabetes` and `validation` respectively). Only the `diabetes` data set is used for model construction. The `validation` data set is used only for assessing the performance of the *final* model. `diabetes` is split into `train` and `test`. Various models are constructed using `train` and their performances are assessed using `test`. The best performing model is then retrained using `diabetes` and assessed using `validation`. This way, `validation` has no effect on which model is selected to be the final model. The R code used to construct these data sets, models and plots is available in [this](https://github.com/alyomahoney/Diabetes_Project) GitHub repo.
+
+# Data Exploration
+The structure of the `edx` data set is shown below. This section aims to visualise and explore the data being worked with.
+
+```{r loading_data, echo = FALSE}
+# at(edx_str, sep = "\n")
+```
+
+
+# Approach 1: Logistic Regression
+
+This section constructs a logistic regression model. The reason logistic regression is used instead of linear regression is that `class` is a binary variable. Therefore, it is appropriate for a model to predict the probability that the `class` of a patient is positive, for example. 
+
+
+Note that not all factors have the same order
+
+# Approach 2: k-Nearest Neighbours
+
+
+
+
+# Approach 3: Decision Tree
+
+
+
+
+# Approach 4: Random Forest
+
+
+
+
+# Ensemble
+
+
+
+
+# Final Model (Results)
+
+
+
+
+# Conclusion
+
+
+
+
+# References
+
+[1] UCI Machine Learning Repository. *Early stage diabetes risk prediction dataset.* [https://archive.ics.uci.edu/ml/datasets/Early+stage+diabetes+risk+prediction+dataset.](https://archive.ics.uci.edu/ml/datasets/Early+stage+diabetes+risk+prediction+dataset.) (date last accessed - 15/10/2020)
+
