@@ -205,7 +205,6 @@ results %>%
   kable(caption = "Table 4: results after construction of the fourth model")
 ```
 
-**WHY BOTSTRAP**????
 
 # Ensemble
 
@@ -225,7 +224,7 @@ cm_ens
 ```{r results5, echo = FALSE}
 results %>%
   slice(1:5) %>%
-  kable(caption = "Table 4: results after construction of all the models")
+  kable(caption = "Table 5: results after construction of all the models")
 ```
 
 
