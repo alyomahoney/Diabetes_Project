@@ -107,7 +107,7 @@ One choice that has to be made when constructing a logistic regression model is 
 
 Classification models have various measures of performance. One is accuracy, which is the proportion of correctly classified patients. Sensitivity is the proportion of diabetic patients who are correctly classified. High sensitivity implies that a model is likely to correctly classify a diabetic patient. However, this can come at a cost of having low Specificity. Specificity is the proportion of non-diabetic patients that are correctly classified. 
 
-Naively classifying everyone as diabetic would give 100% sensitivity, however it would significantly drop the accuracy. Therefore, this report aims to maximise the mean of the accuracy and the sensitivity. 5-fold cross-validation is used to choose an $p$ which maximises the mean of the accuracy and the sensitivity. Figure 8 shows the results from the cross validation, indicating that `r opt_p` is the optimal choice.
+Naively classifying everyone as diabetic would give 100% sensitivity, however it would significantly drop the accuracy. Therefore, this report aims to maximise the mean of the accuracy and the sensitivity. 5-fold cross-validation is used to choose a $p$ which maximises the mean of the accuracy and the sensitivity. Figure 8 shows the results from the cross validation, indicating that `r opt_p` is the optimal choice.
 
 ![Figure 8: Cross validation results for logistic regression model. Optimal p is 4.](rmd_files/images/cv_p.png)
 
@@ -144,7 +144,7 @@ Again, 5-fold cross-validation is used to select $k$ which maximises the mean of
 ![Figure 9: Cross-validation results for kNN model. Optimal k is 3.](rmd_files/images/cv_k.png)
 
 
-Following cross-validation, the `train` data set is used to construct a kNN model using $k=3$. The the confusion matrix is shown below. Table 2 indicates that the accuracy is the same as the logistic regression model, however the sensitivity is slightly lower. 
+Following cross-validation, the `train` data set is used to construct a kNN model using $k=3$. The confusion matrix is shown below. Table 2 indicates that the accuracy is the same as the logistic regression model, however the sensitivity is slightly lower. 
 
 ```{r cm_knn, echo = FALSE}
 cm_knn
@@ -159,7 +159,7 @@ results %>%
 
 # Approach 3: Decision Tree
 
-This section constructs a decision tree. One advantage of decision trees are that they are highly interpretable. The way in which decision trees make classifications is in line with how many people would expect doctors to predict the class of a potentially diabetic patient. The rpart package [[6](https://cran.r-project.org/web/packages/rpart/rpart.pdf)] is used to construct the decision tree. However, before, before the model is constructed, an optimal complexity parameter is chosen (the factor by which the models performance needs to improve by to warrant another split). Bootstrap (25 samples of 25% of the data set) is used to select the optimal complexity parameter. The results are shown in Figure 10. This is the default approach taken by the `train` function in the caret package [[7](https://cran.r-project.org/web/packages/caret/caret.pdf)]. The default `minsplit` of 20 and `minbucket` of 7 are used. The results of the bootstrap are shown in Figure 10, indicating that `r round(opt_cp, 3)` is the optimal choice.
+This section constructs a decision tree. One advantage of decision trees is that they are highly interpretable. The way in which decision trees make classifications is in line with how many people would expect doctors to predict the class of a potentially diabetic patient. The rpart package [[6](https://cran.r-project.org/web/packages/rpart/rpart.pdf)] is used to construct the decision tree. However, before, before the model is constructed, an optimal complexity parameter is chosen (the factor by which the models performance needs to improve by to warrant another split). Bootstrap (25 samples of 25% of the data set) is used to select the optimal complexity parameter. The results are shown in Figure 10. This is the default approach taken by the `train` function in the caret package [[7](https://cran.r-project.org/web/packages/caret/caret.pdf)]. The default `minsplit` of 20 and `minbucket` of 7 are used. The results of the bootstrap are shown in Figure 10, indicating that `r round(opt_cp, 3)` is the optimal choice.
 
 One detail that has not been addressed is how the tree's performance is assessed. The complexity parameter means nothing if there is no way to numerically determine a tree's performance. For regression trees the typical choice is  residual sum of squares. However, it does not make sense for decision trees to use residual sum of sqaures as a loss term. Instead, a common choice (and the one used in this report) is the gini index [[9](https://medium.com/analytics-steps/understanding-the-gini-index-and-information-gain-in-decision-trees-ab4720518ba8)]. Thus, a complexity parameter of 0.01 means that the gini index would need to improve by a factor of at least 0.01 for a split to be made. If the split does not satisfy that condition then no further splits are made.
 
@@ -170,7 +170,7 @@ Figure 11 illustrates exactly how the tree makes decisions. The root node makes 
 
 ![Figure 11: Decision tree.](rmd_files/images/decision_tree.png)
 
-Like the logistic regression model, this decision tree returns probabilities, not classes. Again, some cutoff $p$ is chosen such that $\hat{\pi}_i>p\Rightarrow$ observation $i$ is classed as being diabetic. Figure 12 shows the results from 5-fold cross-validation, highlighting the optimal value of `r round(opt_co, 3)` (this is the median of all values of $p$ which share the highest results). Choosing the median $p$ doesn't actually make a difference in this specific model, however this optimal $p$ is used in the next section. It would also potentially make a difference if a decision tree was to be trained on a new data set (`diabetes` for example).
+Like the logistic regression model, this decision tree returns probabilities, not classes. Again, some cutoff $p$ is chosen such that $\hat{\pi}_i>p\Rightarrow$ observation $i$ is classed as being diabetic. Figure 12 shows the results from 5-fold cross-validation, highlighting the optimal value of `r round(opt_co, 3)` (this is the median of all values of $p$ which share the highest result). Choosing the median $p$ doesn't actually make a difference in this specific model, however this optimal $p$ is used in the next section. It would also potentially make a difference if a decision tree was to be trained on a new data set (`diabetes` for example).
 
 Despite its high level of interpretability, Table 3 shows that the decision tree is the worst performing model. The next section, [Approach 4: Random Forest], expands on the idea of decision trees.
 
@@ -265,7 +265,9 @@ On another note, the ensemble actually achieves 100% accuracy on the `validation
 ## Potential Impact
 Diabetes can have a severe impact on many bodily functions. A machine learning model such as the final model in this report could help to detect diabetes at an early stage. This could prevent strokes, blindness and even amputations in many patients.
 
-A very appealing aspect of the final model is that it is very easy to implement. Where some conditions need medical expertise and advanced equipment, diagnosis for diabetes could be largely aided with a simple questionnaire. Any doctor reading this would rightfully disagree that a diagnosis could be made based on a questionnaire, however if a model trained on a more appropriate data set was to also have an excellent performance, it would be a valuable asset. Granted that patients answer the questions accurately, the test could even be made available online. The results could indicate a percentage of a person being at risk, and if the risk was reasonably high (above 10% or so) the person could be advised to seek proper medical advice.
+A very appealing aspect of the final model is that it is very easy to implement. Where some conditions need medical expertise and advanced equipment, diagnosis for diabetes could be largely aided with a simple questionnaire. Any doctor reading this would rightfully disagree that a diagnosis could be made based solely on a questionnaire, however if a model trained on a more appropriate data set was to also have an excellent performance, it would be a valuable asset. Granted that patients answer the questions accurately, the test could even be made available online. The results could indicate a percentage of a person being at risk, and if the risk was reasonably high (above 10% or so) the person could be advised to seek proper medical advice.
+
+# Acknowledgements
 
 Many thanks are due to Rafael Irizarry, the course instructor of HarvardX's Professional Certificate in Data Science, and to the teaching staff who were always at hand to answer questions and queries raised by students. This edX series has been thoroughly enjoyable and valuable. Irizarry delivered engaging lectures and provided a range of useful coding examples throughout the series.
 
