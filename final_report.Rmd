@@ -1,7 +1,7 @@
 ---
 title: 'Diabetes Project'
 author: "Aly O'Mahoney"
-date: "10/11/2020"
+date: "27/11/2020"
 output:
   rmdformats::readthedown:
     self_contained: true
@@ -273,13 +273,13 @@ Many thanks are due to Rafael Irizarry, the course instructor of HarvardX's Prof
 
 # References
 
-[1] UCI Machine Learning Repository *Early stage diabetes risk prediction dataset.* [https://archive.ics.uci.edu/ml/datasets/Early+stage+diabetes+risk+prediction+dataset.](https://archive.ics.uci.edu/ml/datasets/Early+stage+diabetes+risk+prediction+dataset.) (date last accessed - 15/10/2020)
+[1] UCI Machine Learning Repository *Early stage diabetes risk prediction dataset.* [https://archive.ics.uci.edu/ml/datasets/Early+stage+diabetes+risk+prediction+dataset.](https://archive.ics.uci.edu/ml/datasets/Early+stage+diabetes+risk+prediction+dataset.) (date last accessed - 27/11/2020)
 
-[2] Diabetes.co.uk *Diabetes Prevalence.* https://www.diabetes.co.uk/diabetes-prevalence.html (date last accessed - )
+[2] Diabetes.co.uk *Diabetes Prevalence.* https://www.diabetes.co.uk/diabetes-prevalence.html (date last accessed - 27/11/2020)
 
-[3] Bazain/NHS *Men 'develop diabetes more easily'.* https://www.nhs.uk/news/diabetes/men-develop-diabetes-more-easily/ (date last accessed - ) 
+[3] Bazain/NHS *Men 'develop diabetes more easily'.* https://www.nhs.uk/news/diabetes/men-develop-diabetes-more-easily/ (date last accessed - 27/11/2020) 
 
-[4] Teknomo, Kardi *Distance for Binary Variables* https://people.revoledu.com/kardi/tutorial/Similarity/BinaryVariables.html (date last accessed - )
+[4] Teknomo, Kardi *Distance for Binary Variables* https://people.revoledu.com/kardi/tutorial/Similarity/BinaryVariables.html (date last accessed - 27/11/2020)
 
 [5] Bolotov, D. (2020) *Package 'neighbr'. Classification, Regression, Clustering with K Nearest Neighbors* 
 
@@ -289,6 +289,6 @@ Many thanks are due to Rafael Irizarry, the course instructor of HarvardX's Prof
 
 [8] Breiman, L., Cutler, A. (2018) *Package 'randomForest'. Breiman and Cutler's Random Forests for Classification and Regression* 
 
-[9] Tyagi, N. *Understanding the Gini Index and Information Gain in Decision Trees* https://medium.com/analytics-steps/understanding-the-gini-index-and-information-gain-in-decision-trees-ab4720518ba8 (date last accessed - )
+[9] Tyagi, N. *Understanding the Gini Index and Information Gain in Decision Trees* https://medium.com/analytics-steps/understanding-the-gini-index-and-information-gain-in-decision-trees-ab4720518ba8 (date last accessed - 27/11/2020)
 
 [10] Williamson DF, Vinicor F, Bowman BA. (2004). *Centers For Disease Control and Prevention Primary Prevention Working Group: Primary prevention of type 2 diabetes mellitus by lifestyle intervention: implications for health policy.*
