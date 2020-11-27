@@ -29,7 +29,8 @@ library(neighbr)
 # import and wrangle data
 #########################
 
-# the file "diabetes_data_upload.csv" provided in the github repo must be included in the working directory
+# the github repo with the data set "diabetes_data_upload" is available here: https://github.com/alyomahoney/Diabetes_Project 
+# the file "diabetes_data_upload.csv" provided in the github repo must be included in the working (project) directory for the code below to run
 
 # read in the data and replace spaces in column names with full stops
 data <- read_csv("diabetes_data_upload.csv", col_types = "dffffffffffffffff")
@@ -58,6 +59,79 @@ set.seed(16)
 test_index <- createDataPartition(diabetes$class, times = 1, p = 0.15, list = FALSE)
 train <- diabetes %>% slice(-test_index)
 test <- diabetes %>% slice(test_index)
+
+
+
+
+##################
+# data exploration
+##################
+
+# set global theme (google docs)
+theme_set(theme_gdocs())
+
+# lets first visualise the corrrelation between the features (non significant correlations left blank)
+# probably not worth using pca because the data set is quite small
+bin_diabetes <- sapply({diabetes[,c(-1,-2,-17)] == "Yes"} %>% as_tibble, as.numeric) %>% as_tibble %>% mutate(Gender = as.numeric(diabetes$Gender=="Male"))
+cor_diabetes <- bin_diabetes %>% cor
+p.cor_diabetes <- bin_diabetes %>% cor_pmat
+cor_diabetes %>%
+  ggcorrplot(lab = TRUE, type = "lower", method = "circle",
+             insig = "blank", p.mat = p.cor_diabetes,ggtheme = theme_gdocs(),
+             colors = c("#6D9EC1", "white", "#E46726"),
+             title = "Correlation Plot of variables in Diabetes Data Set", legend.title = "Correlation")
+ggsave("rmd_files/images/correlation.png", width = 9, height = 9)
+
+# compare genders. not many non-diabetic patients are female
+diabetes %>%
+  ggplot(aes(class, fill = Gender)) +
+  geom_bar(width = 0.6, position = position_dodge(width = 0.7)) +
+  ylab("Number of Patients") +
+  ggtitle("Number of Diabetic and Non-Diabet Patients by Gender")
+ggsave("rmd_files/images/gender.png", width = 9, height = 7)
+
+# now comparing age. there doesn't seem to be a significant difference
+diabetes %>%
+  ggplot(aes(Age, class, fill = class)) +
+  geom_violin(alpha = 0.8) +
+  ggtitle("Prevalence of Diabetes by Age")
+ggsave("rmd_files/images/age.png", width = 9, height = 7)
+
+# polyuria and polydipsia appear to be significant
+# if a patient has both conditions, they are very likely to be diabetic
+diabetes %>%
+  ggplot(aes(Polyuria, Polydipsia, colour = class)) +
+  geom_jitter(height = 0.2, width = 0.2) +
+  ggtitle("Prevalence of Diabetes by Polydipsia and Polyuria")
+ggsave("rmd_files/images/dipsiauria.png", width = 9, height = 7)
+
+# this plot suggests that weakness might not be a significant feature
+# however, weight loss could be significant
+diabetes %>%
+  ggplot(aes(sudden.weight.loss, weakness, colour = class)) +
+  geom_jitter(height = 0.2, width = 0.2) +
+  xlab("Sudden Weight Loss") +
+  ylab("Weakness") +
+  ggtitle("Prevalence of Diabetes by Sudden Weight Loss and Weakness")
+ggsave("rmd_files/images/weightweak.png", width = 9, height = 7)
+
+# if a patient has both visual blurring and genital thrush then this plot indicates that they are probably diabetic
+diabetes %>%
+  ggplot(aes(Genital.thrush, visual.blurring, colour = class)) +
+  geom_jitter(height = 0.2, width = 0.2) +
+  xlab("Genital Thrush") +
+  ylab("Visual Blurring") +
+  ggtitle("Prevalence of Diabetes by Genital Thrush and Visual blurring")
+ggsave("rmd_files/images/thrushblurring.png", width = 9, height = 7)
+
+# this is a very interesting plot - it suggests that obesity isn't a really significant factor
+# this goes against general expectations
+diabetes %>%
+  ggplot(aes(class, fill = Obesity)) +
+  geom_bar(width = 0.6, position = position_dodge(width = 0.7)) +
+  ggtitle("Prevalence of Diabetes by Obesity") +
+  ylab("Number of Patients")
+ggsave("rmd_files/images/obesity.png", width = 9, height = 7)
 
 
 
@@ -131,9 +205,10 @@ glm_cv_dat %>%
   ggplot(aes(tune_p, acc)) +
   geom_point() +
   geom_point(aes(opt_p, max(acc)), shape = 5, size = 5) +
-  xlab("Cutoff") +
+  xlab("Cutoff (p)") +
   ylab("Mean of Accuracy and Sensitivity") +
   ggtitle("Mean of Accuracy and Sensitivity for Various Cutoffs")
+ggsave("rmd_files/images/cv_p.png", width = 8, height = 5)
 
 # now use the entire train data set and evaluate the model against the test set
 model_glm <- glm(as.numeric(class=="Positive")~., family = "binomial", data = train)
@@ -141,7 +216,11 @@ preds_glm <- predict(model_glm, test, type = "response")                        
 preds_glm <- ifelse(preds_glm>opt_p, "Positive","Negative") %>% factor(levels = c("Positive","Negative")) # convert probabilities into factors (Positive or Negative)
 
 # confusion matrix
-confusionMatrix(preds_glm, test$class)
+cm_glm <- confusionMatrix(preds_glm, test$class)
+
+# save accuracy and sensitivity
+acc_glm <- cm_glm$overall["Accuracy"]
+sen_glm <- cm_glm$byClass["Sensitivity"]
 
 
 
@@ -209,17 +288,18 @@ for (i in 1:folds) {
 opt_k <- tune_k[which.max(colMeans(acc_k))]
 
 # data frame which is fed into ggplot (below)
-cv_dat <- tibble(k = tune_k,
-                 acc = colMeans(acc_k))
+knn_cv_dat <- tibble(k = tune_k,
+                     acc = colMeans(acc_k))
 
 # visualise the cv results
-cv_dat %>%
+knn_cv_dat %>%
   ggplot(aes(tune_k, acc)) +
   geom_point() +
   geom_point(aes(opt_k, max(acc)), shape = 5, size = 5) +
   xlab("k") +
   ylab("Mean of Accuracy and Sensitivity") +
   ggtitle("Mean of Accuracy and Sensitivity for Various Values of k")
+ggsave("rmd_files/images/cv_k.png", width = 8, height = 5)
 
 # retrain the knn model on train_knn
 model_knn <- knn(train_set = train_knn,
@@ -233,7 +313,11 @@ model_knn <- knn(train_set = train_knn,
 preds_knn <- model_knn$test_set_scores$categorical_target %>% factor(levels = c("Positive","Negative"))
 
 # confusion matrix
-confusionMatrix(preds_knn, test$class)
+cm_knn <- confusionMatrix(preds_knn, test$class)
+
+# save accuracy and sensitivity
+acc_knn <- cm_knn$overall["Accuracy"]
+sen_knn <- cm_knn$byClass["Sensitivity"]
 
 
 
@@ -254,6 +338,7 @@ model_tree_cv <- train(class~.,
 
 # visualise the performance of each cp
 ggplot(model_tree_cv, highlight = TRUE)
+ggsave("rmd_files/images/cv_cp_tree.png", width = 8, height = 5)
 
 # observe the large error for each cp
 model_tree_cv$results %>% 
@@ -271,7 +356,7 @@ opt_cp <- model_tree_cv$bestTune
 model_tree <- rpart(class~., cp = opt_cp, data = train) 
 
 # plot the model - this really helps to understand how the algorithm works
-rpart.plot(model_tree_cv$finalModel, type = 5)
+rpart.plot(model_tree, type = 5)
 title("Decision Tree")
 
 # the predict function returns probabilities, much like the logistic regression model
@@ -335,6 +420,16 @@ tree_cv_dat %>%
 # there are lots of values which achieve the same maximum result, so the median of the cutoffs is used
 opt_co <- median(tune_co[min_rank(desc(colMeans(acc_co)))==1])
 
+# visualise the cv results with the new opt_co
+tree_cv_dat %>%
+  ggplot(aes(tune_co, acc)) +
+  geom_point() +
+  geom_point(aes(opt_co, max(acc)), shape = 5, size = 5) +
+  xlab("p") +
+  ylab("Mean of Accuracy and Sensitivity") +
+  ggtitle("Mean of Accuracy and Sensitivity for Various Values of p")
+ggsave("rmd_files/images/cv_co.png", width = 8, height = 5)
+
 # obtain predictions using opt_p
 preds_tree <- predict(model_tree, validation) %>%
   as_tibble %$%
@@ -342,7 +437,11 @@ preds_tree <- predict(model_tree, validation) %>%
   factor(levels = c("Positive", "Negative"))
 
 # confusion matrix
-confusionMatrix(preds_tree, validation$class)
+cm_tree <- confusionMatrix(preds_tree, validation$class)
+
+# save accuracy and sensitivity
+acc_tree <- cm_tree$overall["Accuracy"]
+sen_tree <- cm_tree$byClass["Sensitivity"]
 
 
 
@@ -373,6 +472,7 @@ model_rf <- train(class~.,
 ggplot(model_rf, highlight = TRUE) +
   scale_x_discrete(limits = 2:12) +
   ggtitle("Accuracy for each number of randomly selected predictors")
+ggsave("rmd_files/images/mtry.png", width = 8, height = 5)
 
 # again, note the variability of each mtry
 model_rf$results %>% 
@@ -387,11 +487,15 @@ model_rf$results %>%
 preds_rf <- predict(model_rf, test)
 
 # confusion matrix
-confusionMatrix(preds_rf, test$class)
+cm_rf <- confusionMatrix(preds_rf, test$class)
 
 # the importance of each variable is also accessible via the importance function
 # polyuria is a clear winner, meaning it is likely to be the root note in most of the decision trees in the forest
 importance(model_rf$finalModel)
+
+# save accuracy and sensitivity
+acc_rf <- cm_rf$overall["Accuracy"]
+sen_rf <- cm_rf$byClass["Sensitivity"]
 
 
 
@@ -414,7 +518,17 @@ preds_ens <- apply(all_preds,1,function(x) names(which.max(table(x)))) %>%
   factor(levels = c("Positive","Negative"))
 
 # confusion matrix (it actually performs worse than the random forest)
-confusionMatrix(preds_ens, test$class)
+cm_ens <- confusionMatrix(preds_ens, test$class)
+
+# save accuracy and sensitivity
+acc_ens <- cm_ens$overall["Accuracy"]
+sen_ens <- cm_ens$byClass["Sensitivity"]
+
+# store all results (rmd)
+results <- tibble(Method = c("Logistic Regression","k-Nearest Neighbours","Decision Tree","Random Forest","Ensemble"),
+                  Accuracy = c(acc_glm, acc_knn, acc_tree, acc_rf, acc_ens),
+                  Sensitivity = c(sen_glm, sen_knn, sen_tree, sen_rf, sen_ens)) %>%
+  mutate(Mean = rowMeans(select(., Accuracy, Sensitivity)))
 
 
 
@@ -428,16 +542,30 @@ confusionMatrix(preds_ens, test$class)
 
 # training the model (using opt_co calculated in the decision tree model)
 # again, cv is used to choose an optimal mtry (25 bootstrap samples with replacement)
+set.seed(1)
 final_model_rf <- train(class~.,
                         method = "rf",
                         tuneGrid = data.frame(mtry = 3:11),
                         cutoff = c(opt_co,1-opt_co),
                         data = diabetes)
 
-# optimal mtry is 3
+# visualise the performance of each mtry
+ggplot(final_model_rf, highlight = TRUE) +
+  scale_x_discrete(limits = 2:12) +
+  ggtitle("Accuracy for each number of randomly selected predictors")
+ggsave("rmd_files/images/mtry_final.png", width = 8, height = 5)
+
+# optimal mtry is 5
 final_model_rf$bestTune
 
 # defining the predictions
 final_preds_rf <- predict(final_model_rf, validation)
 
-confusionMatrix(final_preds_rf, validation$class)
+cm_final <- confusionMatrix(final_preds_rf, validation$class)
+
+# importance of each feature
+imp_final <- importance(final_model_rf$finalModel)
+
+# save accuracy and sensitivity
+acc_final <- cm_final$overall["Accuracy"]
+sen_final <- cm_final$byClass["Sensitivity"]

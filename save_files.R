@@ -1,0 +1,6 @@
+save(opt_cp, opt_co, opt_k, opt_p, file = "rmd_files/rda/optimal_values.rda")
+save(cm_glm, cm_knn, cm_tree, cm_rf, cm_ens, file = "rmd_files/rda/confusion_matrices.rda")
+save(cm_final, imp_final, file = "rmd_files/rda/final.rda")
+save(str_out, file = "rmd_files/rda/structure.rda")
+save(model_glm, model_knn, model_tree, model_rf, final_model_rf, file = "rmd_files/rda/models.rda")
+save(acc_glm, acc_knn, acc_tree, acc_rf, acc_ens, sen_glm, sen_knn, sen_tree, sen_rf, sen_ens, acc_final, sen_final, results, file = "rmd_files/rda/results.rda")
